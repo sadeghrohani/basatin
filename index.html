@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بساتین | خانه</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Vazir', sans-serif;
+      background: #f5f4ef;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to right, #98da70, #6e8f57);
+      color: rgb(0, 0, 0);
+      padding: 40px 20px 30px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+    }
+    header p {
+      font-size: 1rem;
+      margin-top: 10px;
+      opacity: 0.9;
+    }
+    .intro {
+      text-align: center;
+      margin: 30px auto 0;
+      font-size: 1.1rem;
+      color: #4a4a4a;
+      max-width: 700px;
+    }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+    .category-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      padding: 5px 20px;
+      font-size: 1.7rem;
+      font-weight: bold;
+      color: #194201;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      border: 2px solid transparent;
+    }
+    .category-card:hover {
+      background: #f0f7e6;
+      border-color: #bdd7a5;
+      transform: translateY(-5px);
+    }
+    footer {
+      text-align: center;
+      background: #98da70;
+      padding: 5px;
+      font-size: 0.9rem;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>بساتین | ترجمه متون حوزوی 📚</h1>
+    <p>الْکُتُبُ بَسَاتِینُ الْعُلَمَاءِ — امام علی (ع)</p>
+  </header>
+
+  <div class="intro">
+    <p>به بساتین خوش آمدید؛ جایی برای مرور، جستجو و خواندن ترجمه‌های دقیق از متون فاخر حوزه علمیه.</p>
+  </div>
+
+  <div class="category-grid" id="categoryList">
+    <p>در حال بارگذاری موضوعات...</p>
+  </div>
+
+  <footer>
+    <p>بساتین | ترجمه متون حوزوی © 2025</p>
+  </footer>
+
+  <script>
+    fetch('data/categories.json')
+      .then(res => res.json())
+      .then(categories => {
+        const container = document.getElementById('categoryList');
+        container.innerHTML = '';
+        categories.forEach(cat => {
+          const a = document.createElement('a');
+          a.href = `category.html?cat=${encodeURIComponent(cat.id)}`;
+          a.className = 'category-card';
+          a.textContent = cat.name;
+          container.appendChild(a);
+        });
+      })
+      .catch(() => {
+        document.getElementById('categoryList').innerHTML = '<p>خطا در بارگذاری موضوعات.</p>';
+      });
+  </script>
+</body>
+</html>

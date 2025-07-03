@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بساتین | دسته‌بندی</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Vazir', sans-serif;
+      background: #f9f9f4;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to left, #98da70, #6e8f57);
+      color: rgb(0, 0, 0);
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      background: #e5f1da;
+      padding: 15px;
+    }
+    nav a {
+      background: #365329;
+      color: white;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    nav a:hover {
+      background: #4e6f3a;
+    }
+    .search-bar {
+      max-width: 500px;
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    main {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .book-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+    .book-card:hover {
+      transform: translateY(-5px);
+    }
+    .book-card img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      display: block;
+    }
+    .book-info {
+      padding: 15px;
+    }
+    .book-info h3 {
+      font-size: 1.1rem;
+      margin: 0 0 10px;
+    }
+    footer {
+      text-align: center;
+      background: #98da70;
+      padding: 20px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="categoryTitle">موضوع</h1>
+  </header>
+
+  <nav id="topCategories">در حال بارگذاری موضوعات...</nav>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 جستجوی کتاب...">
+  </div>
+
+  <main>
+    <div class="book-grid" id="bookGrid">
+      <p>در حال بارگذاری کتاب‌ها...</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>بساتین | ترجمه متون حوزوی © 2025</p>
+  </footer>
+
+  <script>
+    // بارگذاری موضوعات بالا
+    fetch('data/categories.json')
+      .then(res => res.json())
+      .then(categories => {
+        const container = document.getElementById('topCategories');
+        container.innerHTML = '';
+
+        // لینک صفحه اصلی
+        const homeLink = document.createElement('a');
+        homeLink.href = 'index.html';
+        homeLink.textContent = 'صفحه اصلی';
+        container.appendChild(homeLink);
+
+        categories.forEach(cat => {
+          const a = document.createElement('a');
+          a.href = `category.html?cat=${encodeURIComponent(cat.id)}`;
+          a.textContent = cat.name;
+          container.appendChild(a);
+        });
+      });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryId = urlParams.get('cat');
+
+    const categoryTitleMap = {
+      "fiqh": "فقه",
+      "usul": "اصول فقه",
+      "philosophy": "فلسفه",
+      "theology": "کلام",
+      "hadith": "علوم حدیث",
+      "logic": "منطق",
+      "Arabic": "ادبیات عرب",
+      "Quran": "علوم قرآنی",
+      "ziarat": "ادعیه و زیارات",
+      "akhlaq": "اخلاق",
+      "erfan": "عرفان",
+      "rijal": "رجال و درایه"
+    };
+
+    document.title = `${categoryTitleMap[categoryId] || 'موضوع'} | بساتین`;
+    document.getElementById('categoryTitle').textContent = `📚 ${categoryTitleMap[categoryId] || 'موضوع'}`;
+
+    let allBooks = [];
+
+    fetch('data/books.json')
+      .then(res => res.json())
+      .then(books => {
+        allBooks = books.filter(b => b.category === categoryId);
+        renderBooks(allBooks);
+      });
+
+    function renderBooks(list) {
+      const grid = document.getElementById('bookGrid');
+      grid.innerHTML = '';
+      if (list.length === 0) {
+        grid.innerHTML = '<p>کتابی یافت نشد.</p>';
+        return;
+      }
+      list.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'book-card';
+        card.innerHTML = `
+          <a href="book.html?book=${encodeURIComponent(book.id)}">
+            <img src="${book.cover || 'assets/images/default-cover.jpg'}" alt="${book.title}">
+          </a>
+          <div class="book-info">
+            <h3>${book.title}</h3>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const keyword = e.target.value.toLowerCase();
+      const filtered = allBooks.filter(b => b.title.toLowerCase().includes(keyword));
+      renderBooks(filtered);
+    });
+  </script>
+</body>
+</html>

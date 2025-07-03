@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>📖 فهرست مطالب</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Vazir', sans-serif;
+      background: #fdfcf8;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to left, #98da70, #6e8f57);
+      color: white;
+      padding: 25px 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    .toc-container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+    .toc-container h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    li:hover {
+      background: #f0f7e6;
+    }
+    a {
+      text-decoration: none;
+      color: #2c552e;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      background: #98da70;
+      padding: 20px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📖 فهرست مطالب</h1>
+  </header>
+
+  <div class="toc-container">
+    <h2 id="bookName">در حال بارگذاری...</h2>
+    <ul id="tocList"></ul>
+  </div>
+
+  <footer>
+    بساتین | ترجمه متون حوزوی © 2025
+  </footer>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookId = urlParams.get('book');
+
+    document.getElementById("bookName").textContent = `کتاب: ${bookId}`;
+
+    fetch(`books/${bookId}-toc.json`)
+      .then(res => res.json())
+      .then(toc => {
+        const list = document.getElementById('tocList');
+        list.innerHTML = '';
+        toc.forEach(item => {
+          const li = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = `book.html?book=${bookId}#vol=${item.vol}&page=${item.page}`;
+          link.textContent = `جلد ${item.vol} - صفحه ${item.page + 1}: ${item.title}`;
+          li.appendChild(link);
+          list.appendChild(li);
+        });
+      })
+      .catch(() => {
+        document.getElementById('tocList').innerHTML = '<li>فهرست یافت نشد.</li>';
+      });
+fetch("data/books.json")
+  .then(res => res.json())
+  .then(allBooks => {
+    const book = allBooks.find(b => b.id === bookId);
+    if (book) {
+      document.getElementById("bookTitle") && (document.getElementById("bookTitle").textContent = `📘 ${book.title}`);
+      document.getElementById("bookName") && (document.getElementById("bookName").textContent = `📘 ${book.title}`);
+    }
+  });
+
+
+  </script>
+</body>
+</html>

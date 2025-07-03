@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>📖 نمایش کتاب | بساتین</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Vazir', sans-serif;
+      background: #fcfaf5;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to left, #98da70, #6e8f57);
+      color: white;
+      padding: 25px 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      background: #eff5e9;
+      padding: 15px 20px;
+      align-items: center;
+    }
+    .toolbar select, .toolbar input, .toolbar button {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .book-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 30px 20px;
+    }
+    .page {
+  width: 45%;
+  background: #fdfaf4 url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+  border: 1px solid #d9c7aa;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.07), inset 0 0 30px rgba(255,255,255,0.4);
+  padding: 30px 25px;
+  line-height: 2.5;
+  font-size: 1.15rem;
+  overflow-y: auto;
+  min-height: 450px;
+  transition: transform 0.3s;
+}
+.page:hover {
+  transform: scale(1.01);
+}
+
+    .page.arabic {
+      direction: rtl;
+      border-right: 3px solid #ccc;
+    }
+    .page.persian {
+      direction: rtl;
+    }
+    .pagination, footer {
+      text-align: center;
+      margin: 20px;
+    }
+    mark {
+      background: #ffff99;
+    }
+    footer {
+      background: #98da70;
+      padding: 20px;
+      margin-top: 30px;
+    }
+    .toc {
+      margin: 0 auto;
+      max-width: 800px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+    .toc h3 {
+      margin-top: 0;
+    }
+    .toc ul {
+      list-style: none;
+      padding: 0;
+    }
+    .toc li {
+      margin: 5px 0;
+      cursor: pointer;
+      color: #336633;
+    }
+    .toc li:hover {
+      text-decoration: underline;
+    }
+
+    body.dark {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+body.dark header {
+  background: linear-gradient(to left, #2f3d28, #3f5132);
+  color: #fff;
+}
+body.dark .toolbar {
+  background: #2b2b2b;
+}
+body.dark .page {
+  background: #2a2a2a url('https://www.transparenttextures.com/patterns/dark-mosaic.png');
+  color: #ddd;
+  border-color: #444;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2), inset 0 0 30px rgba(255,255,255,0.05);
+}
+body.dark .page mark {
+  background: #444444;
+  color: yellow;
+}
+body.dark footer {
+  background: #2d2d2d;
+  color: #bbb;
+}
+body.dark select,
+body.dark input,
+body.dark button {
+  background: #3a3a3a;
+  color: #eee;
+  border: 1px solid #555;
+}
+body.dark .toc {
+  background: #262626;
+  border-color: #444;
+  color: #ccc;
+}
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  background: #e5f1da;
+  padding: 15px;
+}
+nav a {
+  background: #365329;
+  color: white;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+nav a:hover {
+  background: #4e6f3a;
+}
+body.dark nav {
+  background: #2d4022;
+}
+body.dark nav a {
+  background: #3a5841;
+}
+body.dark nav a:hover {
+  background: #4a7154;
+}
+.toc-button {
+  background: #d1f3af;
+  color: rgb(218, 17, 17);
+  text-decoration: none;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+.toc-button:hover {
+  background: #4e6f3a;
+}
+
+  </style>
+</head>
+<body>
+ <header>
+  <h1 id="bookTitle">در حال بارگذاری...</h1>
+</header>
+
+<nav id="topCategories">در حال بارگذاری موضوعات...</nav>
+  </header>
+
+  <div class="toolbar">
+    <div>
+      📚 جلد: <select id="volumeSelector"></select>
+<a id="tocLink" class="toc-button">📖 فهرست</a>
+      📄 صفحه: <select id="pageSelector"></select>
+      یا پرش به: <input type="number" id="gotoInput" placeholder="شماره صفحه" style="width:80px">
+      <button onclick="goToPage()">برو</button>
+    </div>
+    <input type="text" id="searchInput" placeholder="جستجو در کل کتاب..." style="flex: 1;" oninput="searchAcrossBook()" />
+ <button onclick="toggleDarkMode()">🌙 حالت شب</button>
+  </div>
+
+  <div class="book-container">
+    <div class="page arabic" id="arabicPage"></div>
+    <div class="page persian" id="persianPage"></div>
+  </div>
+
+  <div class="pagination">
+    <span>صفحه <span id="currentPageNum">1</span> از <span id="totalPageNum">?</span></span>
+  </div>
+
+  <footer>
+    بساتین | ترجمه متون حوزوی © 2025
+  </footer>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookId = urlParams.get('book');
+
+    let currentVol = 1;
+    let arabicPages = [];
+    let persianPages = [];
+    let totalPages = 0;
+    let currentPage = 0;
+    let maxVol = 1;
+
+    const arabicDiv = document.getElementById('arabicPage');
+    const persianDiv = document.getElementById('persianPage');
+    const pageSelector = document.getElementById('pageSelector');
+    const volumeSelector = document.getElementById('volumeSelector');
+    const gotoInput = document.getElementById('gotoInput');
+    const currentPageNum = document.getElementById('currentPageNum');
+    const totalPageNum = document.getElementById('totalPageNum');
+    const bookTitle = document.getElementById('bookTitle');
+    const tocBox = document.getElementById('tocBox');
+    const tocList = document.getElementById('tocList');
+
+    async function detectVolumes() {
+      let vol = 1;
+      while (true) {
+        try {
+          const test = await fetch(`books/${bookId}-vol${vol}-fa.json`);
+          if (!test.ok) break;
+          vol++;
+        } catch {
+          break;
+        }
+      }
+      maxVol = vol - 1;
+      for (let i = 1; i <= maxVol; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `جلد ${i}`;
+        volumeSelector.appendChild(opt);
+      }
+      volumeSelector.onchange = () => {
+        currentVol = Number(volumeSelector.value);
+        loadVolume();
+      };
+      volumeSelector.value = 1;
+      await loadVolume();
+    }
+
+    async function loadVolume() {
+      try {
+        const [ar, fa] = await Promise.all([
+          fetch(`books/${bookId}-vol${currentVol}-ar.json`).then(r => r.json()),
+          fetch(`books/${bookId}-vol${currentVol}-fa.json`).then(r => r.json())
+        ]);
+        arabicPages = ar;
+        persianPages = fa;
+        totalPages = Math.min(ar.length, fa.length);
+        totalPageNum.textContent = totalPages;
+
+        bookTitle.textContent = `📘 کتاب: ${bookId} | جلد ${currentVol}`;
+
+        // page selector
+        pageSelector.innerHTML = '';
+        for (let i = 0; i < totalPages; i++) {
+          const opt = document.createElement('option');
+          opt.value = i;
+          opt.textContent = `صفحه ${i + 1}`;
+          pageSelector.appendChild(opt);
+        }
+        pageSelector.onchange = () => {
+          currentPage = Number(pageSelector.value);
+          renderPage();
+        };
+
+        renderPage();
+      } catch {
+        arabicDiv.textContent = persianDiv.textContent = 'خطا در بارگذاری جلد.';
+      }
+    }
+   window.addEventListener("load", () => {
+  const hash = window.location.hash;
+  let targetVol = 1;
+  let targetPage = 0;
+
+  if (hash && hash.includes("vol=")) {
+    const volMatch = hash.match(/vol=(\d+)/);
+    const pageMatch = hash.match(/page=(\d+)/);
+    if (volMatch && pageMatch) {
+      targetVol = parseInt(volMatch[1]);
+      targetPage = parseInt(pageMatch[1]);
+    }
+  }
+
+  volumeSelector.value = targetVol;
+  currentVol = targetVol;
+
+  loadVolume().then(() => {
+    currentPage = targetPage;
+    renderPage();
+  });
+});
+
+
+
+    function renderPage() {
+      arabicDiv.innerHTML = highlight(arabicPages[currentPage] || '');
+      persianDiv.innerHTML = highlight(persianPages[currentPage] || '');
+      currentPageNum.textContent = currentPage + 1;
+      pageSelector.value = currentPage;
+    }
+
+    function goToPage() {
+      const n = Number(gotoInput.value);
+      if (n > 0 && n <= totalPages) {
+        currentPage = n - 1;
+        renderPage();
+      }
+    }
+
+    function highlight(text) {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) return text;
+      const regex = new RegExp(`(${q})`, 'gi');
+      return text.replace(regex, '<mark>$1</mark>');
+    }
+
+    async function searchAcrossBook() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return renderPage();
+      let found = false;
+
+      for (let vol = 1; vol <= maxVol; vol++) {
+        const fa = await fetch(`books/${bookId}-vol${vol}-fa.json`).then(r => r.json());
+        const ar = await fetch(`books/${bookId}-vol${vol}-ar.json`).then(r => r.json());
+        for (let i = 0; i < fa.length; i++) {
+          if (fa[i].includes(query) || ar[i].includes(query)) {
+            volumeSelector.value = vol;
+            currentVol = vol;
+            arabicPages = ar;
+            persianPages = fa;
+            totalPages = fa.length;
+            currentPage = i;
+            renderPage();
+            found = true;
+            return;
+          }
+        }
+      }
+      if (!found) {
+        alert("یافت نشد!");
+      }
+    }
+
+    async function loadTOC() {
+      try {
+        const toc = await fetch(`books/${bookId}-toc.json`).then(r => r.json());
+        tocBox.style.display = 'block';
+        tocList.innerHTML = '';
+        toc.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = `جلد ${item.vol} - صفحه ${item.page + 1}: ${item.title}`;
+          li.onclick = () => {
+            volumeSelector.value = item.vol;
+            currentVol = item.vol;
+            loadVolume().then(() => {
+              currentPage = item.page;
+              renderPage();
+            });
+          };
+          tocList.appendChild(li);
+        });
+      } catch {
+        tocBox.style.display = 'none';
+      }
+    }
+
+    detectVolumes();
+    loadTOC();
+    function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+}
+// نوار موضوعات بالا
+fetch('data/categories.json')
+  .then(res => res.json())
+  .then(categories => {
+    const container = document.getElementById('topCategories');
+    container.innerHTML = '';
+
+    const homeLink = document.createElement('a');
+    homeLink.href = 'index.html';
+    homeLink.textContent = 'صفحه اصلی';
+    container.appendChild(homeLink);
+
+    categories.forEach(cat => {
+      const a = document.createElement('a');
+      a.href = `category.html?cat=${encodeURIComponent(cat.id)}`;
+      a.textContent = cat.name;
+      container.appendChild(a);
+    });
+  });
+
+document.getElementById("tocLink").href = `toc.html?book=${bookId}`;
+
+fetch("data/books.json")
+  .then(res => res.json())
+  .then(allBooks => {
+    const book = allBooks.find(b => b.id === bookId);
+    if (book) {
+      const h1 = document.getElementById("bookTitle");
+      if (h1) h1.textContent = `📘 ${book.title}`;
+    }
+  });
+
+
+  </script>
+</body>
+</html>
